@@ -1,0 +1,99 @@
+<!doctype html>
+<html>
+  <head><meta charset="UTF-8" /></head>
+  <body>
+    <template>
+      <style>
+        #root { position: absolute; inset: 0; overflow: hidden; background: var(--bg); }
+        #s03-grid { position: absolute; inset: 0; background-image: radial-gradient(rgba(242,238,228,0.07) 1.5px, transparent 1.5px); background-size: 36px 36px; }
+        #s03-floor { position: absolute; left: 0; right: 0; top: 560px; height: 2px; background: var(--bone-20); }
+        #s03-fishwrap { position: absolute; left: 330px; top: 250px; width: 420px; height: 300px; }
+        #s03-fish { position: absolute; inset: 0; }
+        #s03-key { position: absolute; left: 1230px; top: 250px; width: 300px; height: 280px; }
+        #s03-hp { position: absolute; left: 1150px; top: 160px; width: 460px; font-size: 22px; color: var(--bone-50); }
+        #s03-hpbar { margin-top: 10px; height: 16px; border: 2px solid var(--bone-50); border-radius: 8px; padding: 2px; }
+        #s03-hpfill { height: 100%; width: 100%; border-radius: 5px; background: var(--accent); }
+        #s03-mon { position: absolute; left: 330px; top: 160px; font-size: 22px; color: var(--bone-50); }
+        #s03-box { position: absolute; left: 120px; right: 120px; top: 640px; height: 300px; border: 4px solid var(--bone); border-radius: 22px;
+          box-shadow: inset 0 0 0 8px var(--bg), inset 0 0 0 11px var(--bone-20); padding: 54px 70px; }
+        #s03-lyric { font-size: 84px; line-height: 1.12; white-space: normal; text-transform: uppercase; letter-spacing: 0.01em; }
+        #s03-next { position: absolute; right: 52px; bottom: 34px; width: 0; height: 0; border-left: 18px solid transparent; border-right: 18px solid transparent; border-top: 22px solid var(--accent); }
+        #s03-nothing { position: absolute; left: 190px; top: 960px; font-size: 30px; color: var(--bone-50); white-space: pre; }
+        .s03-splash { position: absolute; width: 14px; height: 14px; border-radius: 50%; border: 3px solid var(--accent); opacity: 0; }
+      </style>
+      <div id="root" data-composition-id="s03-magikarp" data-width="1920" data-height="1080">
+        <div id="s03-grid"></div>
+        <div id="s03-floor"></div>
+        <div id="s03-mon" class="f-mono">WILD QUEUE · Lv. 100</div>
+        <div id="s03-fishwrap">
+          <svg id="s03-fish" viewBox="0 0 420 300" fill="none" stroke="var(--bone)" stroke-width="5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M70 160 C 110 70, 290 60, 340 150 C 290 240, 110 240, 70 160 Z" />
+            <path d="M340 150 L 400 95 L 392 150 L 400 205 Z" />
+            <path d="M170 82 L 190 30 L 222 76 L 250 34 L 268 84" />
+            <path d="M150 232 L 132 280 L 196 238" />
+            <circle cx="125" cy="140" r="16" />
+            <circle cx="125" cy="140" r="5" fill="var(--bone)" />
+            <path d="M74 170 C 88 178, 96 176, 104 168" />
+            <path d="M80 128 C 40 110, 30 70, 50 48" />
+            <path d="M200 130 C 215 145, 215 175, 200 190 M 240 125 C 255 145, 255 180, 240 195" stroke="var(--bone-50)" stroke-width="3" />
+          </svg>
+        </div>
+        <div id="s03-hp" class="f-mono">REFRESH KEY · HP<div id="s03-hpbar"><div id="s03-hpfill"></div></div></div>
+        <svg id="s03-key" viewBox="0 0 300 280" fill="none" stroke="var(--bone)" stroke-width="5" stroke-linejoin="round">
+          <rect x="20" y="40" width="260" height="220" rx="28" stroke="var(--bone-50)" />
+          <rect id="s03-cap" x="38" y="22" width="224" height="200" rx="22" fill="var(--bg)" />
+          <text id="s03-f5" x="150" y="148" text-anchor="middle" font-family="JetBrains Mono" font-weight="700" font-size="96" fill="var(--bone)" stroke="none">F5</text>
+        </svg>
+        <div id="s03-splashes"></div>
+        <div id="s03-box"><div id="s03-lyric" class="f-mono"></div><div id="s03-next"></div></div>
+        <div id="s03-nothing" class="f-mono"></div>
+      </div>
+      <script>
+        (function () {
+          const ID = "s03-magikarp", T = window.SCENES[ID], DUR = 3.59, LINE = 3;
+          let seed = 303; const rnd = () => ((seed = (seed * 16807) % 2147483647) / 2147483647);
+          const tl = gsap.timeline({ paused: true });
+          const beats = LF.beats(T, DUR), downs = LF.beats(T, DUR, window.DOWNBEATS);
+          const end = window.LYRICS[LINE].t1 - T;
+
+          // UI slams in on the first frames.
+          tl.fromTo("#s03-box", { y: 60, opacity: 0 }, { y: 0, opacity: 1, duration: 0.22, ease: "power3.out" }, 0);
+          tl.fromTo(["#s03-mon", "#s03-hp"], { opacity: 0 }, { opacity: 1, duration: 0.2 }, 0.05);
+          tl.fromTo("#s03-fishwrap", { x: -260, opacity: 0 }, { x: 0, opacity: 1, duration: 0.3, ease: "back.out(1.6)" }, 0);
+          tl.fromTo("#s03-key", { x: 260, opacity: 0 }, { x: 0, opacity: 1, duration: 0.3, ease: "back.out(1.6)" }, 0);
+          // The fish flops (splashes) and the F5 key gets mashed on every beat; HP never moves.
+          beats.forEach((b, k) => {
+            tl.fromTo("#s03-fishwrap", { y: 0, rotation: 0 }, { y: -70, rotation: k % 2 ? 8 : -8, duration: 0.2, ease: "power2.out", immediateRender: false }, b);
+            tl.fromTo("#s03-fishwrap", { y: -70 }, { y: 0, duration: 0.2, ease: "power2.in", immediateRender: false }, b + 0.2);
+            tl.fromTo("#s03-cap", { y: 0 }, { y: 18, duration: 0.06, ease: "power2.out", immediateRender: false }, b);
+            tl.fromTo("#s03-cap", { y: 18 }, { y: 0, duration: 0.14, ease: "power2.out", immediateRender: false }, b + 0.06);
+            tl.fromTo("#s03-f5", { fill: "#FFD23F" }, { fill: "#F2EEE4", duration: 0.25, immediateRender: false }, b);
+            tl.fromTo("#s03-hpfill", { x: -6 }, { x: 0, duration: 0.18, ease: "steps(3)", immediateRender: false }, b);
+            for (let i = 0; i < 3; i++) {
+              const d = document.createElement("div");
+              d.className = "s03-splash";
+              d.style.left = (540 + (rnd() - 0.5) * 300) + "px"; d.style.top = (520 + rnd() * 30) + "px";
+              document.getElementById("s03-splashes").appendChild(d);
+              tl.fromTo(d, { y: 0, scale: 0.4, opacity: 1 }, { y: -120 - rnd() * 80, scale: 1.4, opacity: 0, duration: 0.5, ease: "power2.out" }, b + 0.05 + i * 0.04);
+            }
+          });
+          // Downbeats: the dialog's "next" arrow bounces.
+          downs.forEach((b) => tl.fromTo("#s03-next", { y: 0 }, { y: 10, duration: 0.15, ease: "power2.out", immediateRender: false }, b));
+
+          document.fonts.ready.then(() => {
+            const m = LF.mount(document.getElementById("s03-lyric"), LINE, { mode: "flow" });
+            // Classic game text: each letter appears (typed) just before it is sung, then fills.
+            m.chars.forEach((c) => tl.fromTo(c.el, { opacity: 0 }, { opacity: 1, duration: 0.01 }, Math.max(0, Math.min(c.t0 - T - 0.12, 0.1 + 0.012 * m.chars.indexOf(c)))));
+            LF.animate(tl, m, T, { held: "swell", settle: 0.7 });
+            // Payoff after the line: "But nothing happened." types in.
+            const msg = "But nothing happened.", out = document.getElementById("s03-nothing");
+            const st = { n: 0 };
+            const p = { _n: 0, get n() { return this._n; }, set n(v) { this._n = v; out.textContent = msg.slice(0, Math.round(v)); } };
+            tl.fromTo(p, { n: 0 }, { n: msg.length, duration: 0.5, ease: "none" }, Math.min(DUR - 0.6, end + 0.02));
+            window.__timelines[ID] = tl;
+          });
+        })();
+      </script>
+    </template>
+  </body>
+</html>
